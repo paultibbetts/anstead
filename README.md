@@ -160,30 +160,30 @@ If you'd like to use [Laravel Horizon]() to manage the queue workers then you ne
 
 **anstead/roles/deploy/hooks/finalize-after.yml**
 
-```
-- name: Restart all queue workers
-  shell: /usr/bin/php artisan queue:restart chdir={{ deploy_helper.new_release_path }}
-```
-becomes
-```
-- name: Restart Horizon
-  shell: /usr/bin/php artisan horizon:terminate chdir={{ deploy_helper.new_release_path }}
+```diff
+- - name: Restart all queue workers
+-  shell: /usr/bin/php artisan queue:restart chdir={{ deploy_helper.new_release_path }}
++ - name: Restart Horizon
++  shell: /usr/bin/php artisan horizon:terminate chdir={{ deploy_helper.new_release_path }}
 ```
 
 **anstead/roles/supervisor/templates/laravel-workers.j2**
 
-only needs to contain the following:
-
-```
-[program:{{ item.key }}-horizon-worker]
-process_name=%(program_name)s
-command=php {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }}/artisan horizon
+```diff
+- [program:{{ item.key }}-worker]
++ [program:{{ item.key }}-horizon-worker]
+- process_name=%(process_num)02d
++ process_name=%(program_name)s
+- command=php {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }}/artisan queue:work --queue=default --tries=2
++ command=php {{ www_root }}/{{ item.key }}/{{ item.value.current_path | default('current') }}/artisan horizon
 autostart=true
 autorestart=true
 user={{ web_user }}
-numprocs=1
+- numprocs=2
++ numprocs=1
 redirect_stderr=true
-stdout_logfile={{ www_root }}/{{ item.key }}/logs/horizon.log
+- stdout_logfile={{ www_root }}/{{ item.key }}/logs/worker.log
++ stdout_logfile={{ www_root }}/{{ item.key }}/logs/horizon.log
 ```
 
 **config/horizon.php**
