@@ -154,11 +154,19 @@ bin/deploy.sh <environment> <app name>
 
 ## Extras
 
+### Installing extra PHP packages
+
+Add the package to the `php_extensions_custom` array in `roles/php/defaults/main.yml` and re-provision the app server by running `ansible-playbook server.yml -e env=production --tags=php`.
+
+### Installing extra software packages
+
+Add the package to the `apt_packages_custom` array in `roles/common/defaults/main.yml` and run the provisioning script again - `htop` is a an example of something I'd add here.
+
 ### Laravel Horizon
 
 If you'd like to use [Laravel Horizon]() to manage the queue workers then you need to make the following changes to Anstead:
 
-**anstead/roles/deploy/hooks/finalize-after.yml**
+`anstead/roles/deploy/hooks/finalize-after.yml`
 
 ```diff
 - - name: Restart all queue workers
@@ -167,7 +175,7 @@ If you'd like to use [Laravel Horizon]() to manage the queue workers then you ne
 +  shell: /usr/bin/php artisan horizon:terminate chdir={{ deploy_helper.new_release_path }}
 ```
 
-**anstead/roles/supervisor/templates/laravel-workers.j2**
+`anstead/roles/supervisor/templates/laravel-workers.j2`
 
 ```diff
 - [program:{{ item.key }}-worker]
@@ -186,14 +194,6 @@ redirect_stderr=true
 + stdout_logfile={{ www_root }}/{{ item.key }}/logs/horizon.log
 ```
 
-**config/horizon.php**
+`config/horizon.php`
 
 Change the `local` environment to `development`.
-
-### Installing extra PHP packages
-
-Add the package to the `php_extensions_custom` array in `roles/php/defaults/main.yml` and re-provision the app server by running `ansible-playbook server.yml -e env=production --tags=php`.
-
-### Installing extra software packages onto each server
-
-Add the package to the `apt_packages_custom` array in `roles/common/defaults/main.yml` and run the provisioning script again - `htop` is a an example of something I'd add here.
