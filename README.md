@@ -37,6 +37,10 @@ TODO:
 - [ ] xdebug
 - [ ] laravel.log file still stored in storage and not managed by logrotate
 
+## Demo
+
+An example project is available at https://github.com/ptibbetts/anstead-example-project
+
 ## What's included
 
 This playbook configures the following and more:
