@@ -1,0 +1,71 @@
+---
+- name: Add Nginx PPA
+  apt_repository:
+    repo: "{{ nginx_ppa }}"
+    update_cache: yes
+
+- name: Install Nginx
+  apt:
+    name: "{{ nginx_package }}"
+    state: present
+    force: yes
+
+- name: Create SSL directory
+  file:
+    mode: 0700
+    path: "{{ nginx_path }}/ssl"
+    state: directory
+
+- name: Generate strong unique Diffie-Hellman group.
+  command: openssl dhparam -out dhparams.pem 2048
+  args:
+    chdir: "{{ nginx_path }}/ssl"
+    creates: "{{ nginx_path }}/ssl/dhparams.pem"
+  when: laravel_apps.values() | map(attribute='ssl') | selectattr('enabled') | list | count
+  notify: reload nginx
+  tags: [diffie-hellman]
+
+- name: Grab h5bp/server-configs-nginx
+  git:
+    repo: "https://github.com/h5bp/server-configs-nginx.git"
+    dest: "{{ nginx_path }}/h5bp-server-configs"
+    version: c5c6602232e0976d9e69d69874aa84d2a2698265
+    force: yes
+
+- name: Move h5bp configs
+  command: rsync -ac --delete --info=NAME {{ nginx_path }}/h5bp-server-configs/h5bp/ {{ nginx_path }}/h5bp
+  register: h5bp_nginx_sync
+  changed_when: h5bp_nginx_sync.stdout != ''
+  notify: reload nginx
+
+- name: Create nginx.conf
+  template:
+    src: "{{ nginx_conf }}"
+    dest: "{{ nginx_path }}/nginx.conf"
+  notify: reload nginx
+  tags: nginx-includes
+
+- name: Disable default server
+  file:
+    path: "{{ nginx_path }}/sites-enabled/default"
+    state: absent
+  notify: reload nginx
+
+- name: Create Nginx available sites
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ nginx_path }}/sites-available/{{ item.src | basename | regex_replace('.j2$', '') }}"
+  with_items: "{{ nginx_sites_confs }}"
+  when: item.enabled | default(true)
+  notify: reload nginx
+  tags: nginx-sites
+
+- name: Enable or disable Nginx sites
+  file:
+    path: "{{ nginx_path }}/sites-enabled/{{ item.src | basename | regex_replace('.j2$', '') }}"
+    src: "{{ nginx_path }}/sites-available/{{ item.src | basename | regex_replace('.j2$', '') }}"
+    state: "{{ item.enabled | default(true) | ternary('link', 'absent') }}"
+    force: yes
+  with_items: "{{ nginx_sites_confs }}"
+  notify: reload nginx
+  tags: nginx-sites

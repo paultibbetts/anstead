@@ -1,0 +1,28 @@
+---
+- name: Test Connection and Determine Remote User
+  hosts: "{{ env }}"
+  gather_facts: false
+  roles:
+    - { role: connection, tags: [connection, always] }
+
+- name: Install prerequisites
+  hosts: "{{ env }}"
+  gather_facts: false
+  become: yes
+  tasks:
+    - name: Install Python 2.x
+      raw: which python || sudo apt-get update && sudo apt-get install -qq -y python-simplejson
+      register: python_check
+      changed_when: not python_check.stdout | search('/usr/bin/python')
+
+- name: Common
+  hosts: "{{ env }}"
+  become: yes
+  roles:
+    - { role: common, tags: [common] }
+    - { role: fail2ban, tags: [fail2ban] }
+    - { role: ntp, tags: [ntp] }
+    - { role: users, tags: [users] }
+    - { role: sshd, tags: [sshd] }
+    - { role: ferm, tags: [ferm] }
+    

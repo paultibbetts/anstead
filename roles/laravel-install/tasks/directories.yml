@@ -1,0 +1,27 @@
+---
+- name: Create current directory for app(s)
+  file:
+    path: "{{ www_root }}/{{ item.key }}/current"
+    owner: "{{ web_user }}"
+    group: "{{ web_group }}"
+    mode: 0755
+    state: directory
+  with_dict: "{{ laravel_apps }}"
+
+- name: Create shared folder for app(s)
+  file:
+    path: "{{ www_root }}/{{ item.key }}/shared"
+    owner: "{{ web_user }}"
+    group: "{{ web_group }}"
+    mode: 0755
+    state: directory
+  with_dict: "{{ laravel_apps }}"
+
+- name: Change site owner to user
+  file:
+    path: "{{ www_root }}/{{ item.key }}"
+    owner: "{{ web_user }}"
+    group: "{{ web_group }}"
+    state: directory
+    recurse: yes
+  with_dict: "{{ laravel_apps }}"

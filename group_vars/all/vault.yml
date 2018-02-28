@@ -1,0 +1,3 @@
+# mail
+vault_mail_password: smtp_password
+vault_sparkpost_secret: example

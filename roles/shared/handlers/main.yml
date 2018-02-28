@@ -1,0 +1,10 @@
+---
+- name: disable temporary challenge sites
+  import_tasks: "{{ playbook_dir }}/roles/shared/tasks/disable_challenge_sites.yml"
+
+- name: reload php-fpm
+  service:
+    name: php7.1-fpm
+    state: reloaded
+
+- import_tasks: "{{ playbook_dir }}/roles/shared/tasks/reload_nginx.yml"

@@ -1,0 +1,31 @@
+laravel_env_defaults:
+  app_debug: false
+  app_env: "{{ env }}"
+  app_key: "" # this is automatically set by artisan key:generate on installation
+  app_url: http://example.test
+  db_database: "{{ item.key | underscore }}_{{ env }}"
+  db_username: "{{ item.key | underscore }}"
+  db_user_host: localhost
+  db_host: localhost
+  db_connection: mysql
+  db_port: 3306
+  disable_app_cron: true
+  cache_driver: redis
+  session_driver: redis
+  queue_driver: redis
+  redis_host: 127.0.0.1
+  redis_password: "{{ vault_redis_password }}"
+  redis_port: 6379
+  mail_driver: smtp
+  mail_host: 127.0.0.1
+  mail_port: 1025
+  mail_user: testuser
+  mail_password: testpwd
+  mail_encryption: "null"
+
+site_env: "{{ laravel_env_defaults | combine(item.value.env | default({}), vault_laravel_apps[item.key].env) }}"
+site_hosts_canonical: "{{ item.value.site_hosts | map(attribute='canonical') | list }}"
+site_hosts_redirects: "{{ item.value.site_hosts | selectattr('redirects', 'defined') | sum(attribute='redirects', start=[]) | list }}"
+site_hosts: "{{ site_hosts_canonical | union(site_hosts_redirects) }}"
+ssl_enabled: "{{ item.value.ssl is defined and item.value.ssl.enabled | default(false) }}"
+ssl_stapling_enabled: "{{ item.value.ssl is defined and item.value.ssl.stapling_enabled | default(true) }}"

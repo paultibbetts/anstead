@@ -1,0 +1,2 @@
+apps_using_remote_db: "[{% for name, site in laravel_apps.iteritems() if site.env is defined and site.env.db_host | default('localhost') != 'localhost' %}'{{ name }}',{% endfor %}]"
+apps_using_remote_redis:  "[{% for name, site in laravel_apps.iteritems() if site.env is defined and site.env.redis_host | default('127.0.0.1') != '127.0.0.1' %}'{{ name }}',{% endfor %}]"

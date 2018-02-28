@@ -1,0 +1,7 @@
+---
+- name: disable temporary challenge sites
+  file:
+    path: "{{ nginx_path }}/sites-enabled/letsencrypt-{{ item }}.conf"
+    state: absent
+  with_items: "{{ laravel_apps.keys() }}"
+  notify: reload nginx

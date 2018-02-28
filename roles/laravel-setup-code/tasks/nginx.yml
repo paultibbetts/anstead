@@ -1,0 +1,44 @@
+---
+- name: Copy SSL cert
+  copy:
+    src: "{{ item.value.ssl.cert }}"
+    dest: "{{ nginx_ssl_path }}/{{ item.value.ssl.cert | basename }}"
+    mode: 0640
+  with_dict: "{{ laravel_apps }}"
+  when: ssl_enabled and item.value.ssl.cert is defined
+  notify: reload nginx
+
+- name: Copy SSL key
+  copy:
+    src: "{{ item.value.ssl.key }}"
+    dest: "{{ nginx_ssl_path }}/{{ item.value.ssl.key | basename }}"
+    mode: 0600
+  with_dict: "{{ laravel_apps }}"
+  when: ssl_enabled and item.value.ssl.key is defined
+  notify: reload nginx
+
+- import_tasks: "{{ playbook_dir }}/roles/shared/tasks/disable_challenge_sites.yml"
+
+- name: Create Nginx conf for challenges location
+  template:
+    src: "{{ playbook_dir }}/roles/letsencrypt/templates/acme-challenge-location.conf.j2"
+    dest: "{{ nginx_path }}/acme-challenge-location.conf"
+  notify: reload nginx
+
+- name: Create Laravel configuration for Nginx
+  template:
+    src: "{{ item.value.nginx_laravel_app_conf | default(nginx_laravel_app_conf) }}"
+    dest: "{{ nginx_path }}/sites-available/{{ item.key }}.conf"
+  with_dict: "{{ laravel_apps }}"
+  notify: reload nginx
+  tags: nginx-includes
+
+- name: Enable Laravel app
+  file:
+    src: "{{ nginx_path }}/sites-available/{{ item.key }}.conf"
+    dest: "{{ nginx_path }}/sites-enabled/{{ item.key }}.conf"
+    owner: root
+    group: root
+    state: link
+  with_dict: "{{ laravel_apps }}"
+  notify: reload nginx

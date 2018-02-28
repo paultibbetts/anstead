@@ -1,0 +1,14 @@
+# Define accompanying passwords/secrets in group_vars/staging/vault.yml
+laravel_apps:
+  example.com:
+    site_hosts:
+      - canonical: staging.example.com
+    local_path: ../laravel # path targeting local Laravel directory (relative to Ansible root)
+    repo: git@github.com:example/example.git
+    repo_subtree_path: laravel # relative path to your Laravel directory in your repo
+    branch: master
+    ssl:
+      enabled: false
+      provider: self-signed
+    env:
+      app_key: "generateme" # artisan key:generate --show

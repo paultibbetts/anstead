@@ -1,0 +1,13 @@
+alias phpspec='vendor/bin/phpspec'
+alias phpunit='vendor/bin/phpunit'
+alias art=artisan
+
+function artisan() {
+    php artisan "$@"
+}
+
+function tinker() {
+  php artisan tinker
+}
+
+alias jsonpreffity="python -mjson.tool"

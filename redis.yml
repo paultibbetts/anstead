@@ -1,0 +1,18 @@
+---
+- name: Redis
+  hosts: redis:&{{ env }}
+  become: yes
+  vars:  
+    ferm_input_list:
+      - type: dport_accept
+        dport: ["6379"]
+        filename: redis_accept
+        when: apps_using_remote_redis | count
+  roles:
+    - { role: ferm, tags: [ferm] }
+    - { role: redis, tags: [redis] }
+  tasks:
+    - name: Install Redis tools
+      apt:
+        name: redis-tools
+        state: present

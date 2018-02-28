@@ -1,0 +1,14 @@
+---
+- name: "Database"
+  hosts: database:&{{ env }}
+  become: yes
+  vars: 
+    ferm_input_list:
+      - type: dport_accept
+        dport: ["3306"] 
+        filename: database_accept
+        when: apps_using_remote_db | count
+  roles:
+    - { role: ferm, tags: [ferm] }
+    - { role: mariadb-server, tags: [mariadb, mariadb-server] }
+    - { role: laravel-setup-database, tags: [laravel, laravel-setup-database] }

@@ -1,0 +1,15 @@
+---
+- name: "Laravel: Install LEMP Stack with PHP 7.1"
+  hosts: web:&{{ env }}
+  become: yes
+  roles:
+    - { role: web-user, tags: [web-user] }
+    - { role: ssmtp, tags: [ssmtp, mail] }
+    - { role: php, tags: [php] }
+    - { role: supervisor, tags: [supervisor] }
+    - { role: nginx, tags: [nginx] }
+    - { role: mariadb-client, tags: [mariadb, mariadb-client] }
+    - { role: logrotate, tags: [logrotate] }
+    - { role: composer, tags: [composer] }
+    - { role: letsencrypt, tags: [letsencrypt], when: apps_using_letsencrypt | count }
+    - { role: laravel-setup-code, tags: [laravel, laravel-setup-code] }

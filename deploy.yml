@@ -1,0 +1,31 @@
+---
+- import_playbook: variable-check.yml
+  vars:
+    playbook: deploy.yml
+
+- name: Test Connection
+  hosts: web:&{{ env }}
+  gather_facts: false
+  vars:
+    dynamic_user: false
+  roles:
+    - { role: connection, tags: [connection, always] }
+
+- name: Deploy Laravel app
+  hosts: web:&{{ env }}
+  remote_user: "{{ web_user }}"
+  pre_tasks:
+    - name: Ensure site is valid
+      connection: local
+      fail:
+        msg: "Site `{{ site | default('') }}` is not valid. Available apps to deploy: {{ laravel_apps.keys() | join(', ') }}"
+      when: laravel_apps[site | default('')] is not defined
+    - name: Ensure repo is valid
+      connection: local
+      fail:
+        msg: |
+          Invalid Git repository.
+          Ensure that your site's `repo` variable is defined in `group_vars/{{ env }}/laravel_apps.yml` and uses the SSH format (example: git@github.com:example/example.git)
+      when: project.repo is not defined or not project.repo | match(".*@.*:.*\.git")
+  roles:
+    - deploy

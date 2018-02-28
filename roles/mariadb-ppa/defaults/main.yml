@@ -1,0 +1,3 @@
+mariadb_keyserver: keyserver.ubuntu.com
+mariadb_keyserver_id: "0xF1656F24C74CD1D8"
+mariadb_ppa: "deb [arch=amd64,i386,ppc64el] http://ftp.osuosl.org/pub/mariadb/repo/10.2/ubuntu xenial main"

@@ -1,0 +1,16 @@
+# Add each host to the [production] group and to a "type" group such as [web] or [db].
+# List each machine only once per [group], even if it will host multiple sites.
+
+[production]
+example.com
+external_ip_of_database_server
+external_ip_of_redis_server
+
+[web]
+example.com
+
+[database]
+external_ip_of_database_server
+
+[redis]
+external_ip_of_redis_server

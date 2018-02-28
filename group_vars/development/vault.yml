@@ -1,0 +1,9 @@
+vault_mysql_root_password: devpw
+vault_redis_password: devpw
+
+# Variables to accompany `group_vars/development/laravel_apps.yml`
+vault_laravel_apps:
+  example.com:
+    env:
+      db_password: example_dbpassword
+      # the development environment uses the defaults set in group_vars/all/vault.yml

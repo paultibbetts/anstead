@@ -1,0 +1,13 @@
+# Define accompanying passwords/secrets in group_vars/development/vault.yml
+laravel_apps:
+  example.com:
+    site_hosts:
+      - canonical: example.test
+        redirects:
+          - www.example.test
+    local_path: ../laravel # path targeting app directory (relative to Ansible root)
+    ssl:
+      enabled: true
+      provider: self-signed
+    env:
+      app_debug: true

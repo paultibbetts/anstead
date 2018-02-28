@@ -1,0 +1,29 @@
+---
+- name: Run the migrations
+  command: /usr/bin/php artisan migrate --force
+  args:
+    chdir: "{{ deploy_helper.new_release_path }}"
+  with_dict: "{{ laravel_apps }}"
+
+- name: Link the storage directory
+  command: /usr/bin/php artisan storage:link
+  args:
+    chdir: "{{ deploy_helper.new_release_path }}"
+  with_dict: "{{ laravel_apps }}"
+
+- name: Reload php-fpm
+  shell: sudo service php7.1-fpm reload
+  args:
+    chdir: "{{ deploy_helper.new_release_path }}"
+    warn: false
+
+- name: Update queue workers
+  shell: sudo supervisorctl reread && sudo supervisorctl update
+  args:
+    chdir: "{{ deploy_helper.new_release_path }}"
+    warn: false
+
+- name: Restart all queue workers
+  shell: /usr/bin/php artisan queue:restart
+  args:
+    chdir: "{{ deploy_helper.new_release_path }}"

@@ -1,0 +1,91 @@
+---
+- name: determine if start file exists
+  stat: path="{{ deploy_helper.new_release_path }}/bootstrap/start.php"
+  register: laravel_fact_start_file_exist
+
+- name: ensure start file exists
+  file: path="{{ deploy_helper.new_release_path }}/bootstrap/start.php" state=touch
+  when: laravel_fact_start_file_exist.stat.exists == false
+
+- name: re-determine if start file exists
+  stat: path="{{ deploy_helper.new_release_path }}/bootstrap/start.php"
+  register: laravel_fact_start_file_exist
+
+- name: ensure start file has correct permissions
+  file: path="{{ deploy_helper.new_release_path }}/bootstrap/start.php" mode=0755 state=file
+  when: laravel_fact_start_file_exist.stat.mode != 0775
+
+- name: Ensure the public folder is present
+  file:
+    path: "{{ deploy_helper.new_release_path }}/storage/app/public"
+    mode: 0775
+    state: directory
+    group: "{{ web_group }}"
+    owner: "{{ web_user }}"
+
+- name: Ensure the public lists folder is present
+  file:
+    path: "{{ deploy_helper.new_release_path }}/storage/app/public/lists"
+    mode: 0775
+    state: directory
+    group: "{{ web_group }}"
+    owner: "{{ web_user }}"
+
+- name: Ensure the dump folder is present
+  file:
+    path: "{{ deploy_helper.new_release_path }}/storage/app/ch"
+    mode: 0775
+    state: directory
+    group: "{{ web_group }}"
+    owner: "{{ web_user }}"
+
+- name: Ensure the accounts folder is present
+  file:
+    path: "{{ deploy_helper.new_release_path }}/storage/app/accounts"
+    mode: 0775
+    state: directory
+    group: "{{ web_group }}"
+    owner: "{{ web_user }}"
+
+- name: Ensure the cache folder is present
+  file:
+    path: "{{ deploy_helper.new_release_path }}/storage/framework/cache"
+    mode: 0775
+    state: directory
+    group: "{{ web_group }}"
+    owner: "{{ web_user }}"
+
+- name: Ensure the sessions folder is present
+  file:
+    path: "{{ deploy_helper.new_release_path }}/storage/framework/sessions"
+    mode: 0775
+    state: directory
+    group: "{{ web_group }}"
+    owner: "{{ web_user }}"
+
+- name: Ensure the views folder is present
+  file:
+    path: "{{ deploy_helper.new_release_path }}/storage/framework/views"
+    mode: 0775
+    state: directory
+    group: "{{ web_group }}"
+    owner: "{{ web_user }}"
+
+- name: Ensure the logs folder is present
+  file:
+    path: "{{ deploy_helper.new_release_path }}/storage/logs"
+    mode: 0775
+    state: directory
+    group: "{{ web_group }}"
+    owner: "{{ web_user }}"
+
+- name: Ensure the log file is present
+  file: path="{{ deploy_helper.new_release_path }}/storage/logs/laravel.log" state=touch mode=0775
+
+- name: Set ownership of app to web
+  file:
+    path: "{{ deploy_helper.new_release_path }}"
+    state: directory
+    group: "{{ web_group }}"
+    owner: "{{ web_user }}"
+    recurse: yes

@@ -1,0 +1,23 @@
+---
+- block: 
+  - name: Create database for app(s)
+    mysql_db:
+      name: "{{ site_env.db_database }}"
+      state: present
+      login_host: "localhost"
+      login_user: "{{ mysql_root_user }}"
+      login_password: "{{ mysql_root_password }}"
+    with_dict: "{{ laravel_apps }}"
+
+  - name: Create/assign database user to db and grant permissions
+    mysql_user:
+      name: "{{ site_env.db_username }}"
+      password: "{{ site_env.db_password }}"
+      append_privs: yes
+      priv: "{{ site_env.db_database }}.*:ALL"
+      state: present
+      host: "{{ '%' if apps_using_remote_db else 'localhost' }}"
+      login_host: "localhost"
+      login_user: "{{ mysql_root_user }}"
+      login_password: "{{ mysql_root_password }}"
+    with_dict: "{{ laravel_apps }}"

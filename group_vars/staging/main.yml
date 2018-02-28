@@ -1,0 +1,4 @@
+# Define these variables in group_vars/staging/vault.yml
+
+mysql_root_password: "{{ vault_mysql_root_password }}"
+redis_password: "{{ vault_redis_password }}"

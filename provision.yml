@@ -1,0 +1,9 @@
+---
+- import_playbook: variable-check.yml
+  vars:
+    playbook: provision.yml
+
+- import_playbook: server.yml
+- import_playbook: database.yml
+- import_playbook: redis.yml
+- import_playbook: app.yml

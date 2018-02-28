@@ -1,0 +1,8 @@
+Invalid Laravel apps configuration: site names in `laravel_apps` must have matching entry in `vault_laravel_apps`.
+
+Sites without a matching vault entry:
+{% for name in laravel_apps.keys() | difference(vault_laravel_apps.keys()) %}
+* `{{ name }}`
+{% endfor %}
+
+Update `group_vars/{{ env }}/vault.yml` to continue.

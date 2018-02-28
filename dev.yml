@@ -1,0 +1,31 @@
+---
+- name: "Laravel Server: Install LEMP Stack with PHP 7.1, MariaDB and Redis"
+  hosts: development
+  become: yes
+  remote_user: vagrant
+
+  roles:
+    - { role: common, tags: [common] }
+    - { role: fail2ban, tags: [fail2ban] }
+    - { role: ferm, tags: [ferm] }
+    - { role: ntp, tags: [ntp] }
+    - { role: sshd, tags: [sshd] }
+    - { role: mariadb-client, tags: [mariadb, mariadb-client] }
+    - { role: mariadb-server, tags: [mariadb, mariadb-server] }
+    - { role: mailhog, tags: [mailhog, mail] }
+    - { role: php, tags: [php] }
+    - { role: redis, tags: [redis] }
+    - { role: supervisor, tags: [supervisor] }
+    - { role: xdebug, tags: [php, xdebug] }
+    - { role: nginx, tags: [nginx] }
+    - { role: logrotate, tags: [logrotate] }
+    - { role: composer, tags: [composer] }
+    - { role: laravel-setup-database, tags: [laravel, laravel-setup-database] }
+    - { role: laravel-setup-code, tags: [laravel, laravel-setup-code] }
+    - { role: laravel-install, tags: [laravel, laravel-install] }
+
+  tasks:
+    - name: Install Redis tools
+      apt:
+        name: redis-tools
+        state: present

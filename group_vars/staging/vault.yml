@@ -1,0 +1,16 @@
+# You can generate passwords using `openssl rand -base64 16`
+
+vault_mysql_root_password: stagingpw 
+vault_redis_password: stagingpw
+
+vault_users:
+  - name: "{{ admin_user }}"
+    password: example_password
+    salt: "generateme"
+
+# Variables to accompany `group_vars/staging/laravel_apps.yml`
+# Note: the site name (`example.com`) must match up with the site name in the above file.
+vault_laravel_apps:
+  example.com:
+    env:
+      db_password: "password"
