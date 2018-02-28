@@ -115,19 +115,19 @@ You can customise these aliases and add your own by editing the `/aliases` file.
 
 At least one base `Ubuntu 16.04` server is required for setting up remote servers.
 
-### I want all services on the same server
+### _I want all services on the same server_
 
 This is how the staging environment is setup by default.
 
 To change the production environment you'll need to add the IP address of the server to the `/hosts/production` file under `[production]` and each of the services.
 
-### I want a separate server for each service
+### _I want a separate server for each service_
 
 This is the how the production environment is setup by default but you will still need to configure it to get it to work.
 
 You must make sure each server has private networking (internal IP addresses) enabled so that communication between the servers is both faster and cheaper - you don't usually have to pay for bandwidth on the internal network.
 
-You need to add the domain of the web server and the **external** IP addresses of the database and Redis servers to the `/hosts/production` file. Then you need to add the **private/internal** IP address of each server under the `env` section in the `/group_vars/production/vault.yml` file.
+You need to add the domain of the web server and the **external** IP addresses of the database and Redis servers to the `/hosts/production` file. Then you need to add the **private/internal** IP address of each server under the `env` section in the `/group_vars/production/laravel_apps.yml` file.
 
 This is so that you can connect to the servers with Ansible using the external IP but each server can communicate with each other using the internal network.
 
